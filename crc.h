@@ -25,10 +25,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  ******************************************************************************/
 
-/*
- * $Id: crc.h,v 1.1.1.1 2003/01/29 20:50:07 ninja Exp $
- */
-
 #define CRC_8     0
 #define CRC_10    1
 #define CRC_12    2
@@ -38,14 +34,7 @@
 
 #define CRC_INIT 0
 
-struct CRC
-{
-  int bits;
-  unsigned long mask;
-  unsigned long r_mask;
-};
-
-unsigned long crc_block(int type, const char * data, int len);
-void crc(int type, unsigned long * crc, const char * data, int len);
+unsigned long crc_block(int type, const char* data, int len);
+void crc(int type, unsigned long* crc, const char* data, int len);
 
 #endif

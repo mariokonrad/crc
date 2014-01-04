@@ -22,55 +22,55 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  ******************************************************************************/
 
-/*
- * $Id: crc.c,v 1.1.1.1 2003/01/29 20:50:07 ninja Exp $
- */
-
 #include "crc.h"
+
+struct CRC
+{
+	int bits;
+	unsigned long mask;
+	unsigned long r_mask;
+};
 
 static const struct CRC CRC_TYPES[] =
 {
-  {  8, 0x00000007, 0x000000ff },
-  { 10, 0x00000233, 0x000003ff },
-  { 12, 0x0000080f, 0x00000fff },
-  { 16, 0x00008005, 0x0000ffff },
-  { 16, 0x00001021, 0x0000ffff },
-  { 32, 0x04c11db7, 0xffffffff },
+	{  8, 0x00000007, 0x000000ff }, /* CRC_8     */
+	{ 10, 0x00000233, 0x000003ff }, /* CRC_10    */
+	{ 12, 0x0000080f, 0x00000fff }, /* CRC_12    */
+	{ 16, 0x00008005, 0x0000ffff }, /* CRC_16    */
+	{ 16, 0x00001021, 0x0000ffff }, /* CRC_CCITT */
+	{ 32, 0x04c11db7, 0xffffffff }, /* CRC_32    */
 };
 
-void crc(int type, unsigned long * crc, const char * data, int len)
+void crc(int type, unsigned long* crc, const char* data, int len)
 {
-  unsigned long tmpcrc;
-  int i, j;
-  unsigned long c;
+	unsigned long tmpcrc;
+	int i;
+	int j;
+	unsigned long c;
 
-  if (!data) return;
-  if (!crc) return;
-  tmpcrc = *crc;
-  for (j = 0; j < len; j++)
-    {
-      c = data[j] << (CRC_TYPES[type].bits - 8);
-      for (i = 0; i < 8; i++)
-	{
-	  if ((tmpcrc ^ c) & (1 << (CRC_TYPES[type].bits-1)))
-	    {
-	      tmpcrc = (tmpcrc << 1) ^ CRC_TYPES[type].mask;
-	    }
-	  else
-	    {
-	      tmpcrc <<= 1;
-	    }
-	  c <<= 1;
+	if (!data)
+		return;
+	if (!crc)
+		return;
+	tmpcrc = *crc;
+	for (j = 0; j < len; j++) {
+		c = data[j] << (CRC_TYPES[type].bits - 8);
+		for (i = 0; i < 8; ++i) {
+			if ((tmpcrc ^ c) & (1 << (CRC_TYPES[type].bits-1))) {
+				tmpcrc = (tmpcrc << 1) ^ CRC_TYPES[type].mask;
+			} else {
+				tmpcrc <<= 1;
+			}
+			c <<= 1;
+		}
 	}
-    }
-  *crc = tmpcrc & CRC_TYPES[type].r_mask;
+	*crc = tmpcrc & CRC_TYPES[type].r_mask;
 }
 
-unsigned long crc_block(int type, const char * data, int len)
+unsigned long crc_block(int type, const char* data, int len)
 {
-  unsigned long crc_value = CRC_INIT;
-  crc(type, &crc_value, data, len);
-  return crc_value;
+	unsigned long crc_value = CRC_INIT;
+	crc(type, &crc_value, data, len);
+	return crc_value;
 }
 
-/* EOF */
